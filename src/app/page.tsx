@@ -144,18 +144,8 @@ export default function Home() {
                 <button onClick={() => scrollToSection("data")} className="pointer-events-auto rounded-xl bg-[#10B981]/0 hover:bg-[#10B981]/10 border border-transparent hover:border-[#10B981]/30 transition flex items-start justify-end p-2"><span className="font-mono text-[10px] text-white/0 hover:text-[#10B981]">DATA →</span></button>
               </div>
             </div>
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {[
-                { id: "software", label: "SOFTWARE" },
-                { id: "cloud", label: "CLOUD" },
-                { id: "ai", label: "AI" },
-                { id: "data", label: "DATA" },
-              ].map((m) => (
-                <button key={m.id} onClick={() => scrollToSection(m.id)} onMouseEnter={() => setActiveModule(m.id)} className={`text-left p-2.5 rounded-xl border transition-all ${activeModule === m.id ? "bg-[#8B5CF6]/20 border-[#8B5CF6]/50" : "bg-white/[0.04] border-white/[0.06] hover:bg-white/[0.08]"}`}>
-                  <div className="font-mono text-[10px] tracking-widest text-white/60">{m.label}</div>
-                  {activeModule === m.id && <div className="mt-1 h-0.5 bg-[#8B5CF6] rounded-full animate-pulse" />}
-                </button>
-              ))}
+                        <div className="mt-3 text-center font-mono text-[10px] tracking-widest text-white/30">
+              High-quality • Rings + Core only • Scroll to morph • Drag to rotate
             </div>
           </motion.div>
 

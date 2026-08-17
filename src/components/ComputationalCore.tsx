@@ -130,77 +130,7 @@ function Core({ activeModule, scrollProgress }: { activeModule: string | null; s
         </mesh>
       </Float>
 
-      {/* Modules - with icons/text inside - clearly in front, no clipping */}
-      {[
-        { label: "CODE", basePos: [3.4, 0.7, 0.4], color: "#8B5CF6" as const, id: "software", icon: "◧" },
-        { label: "CLOUD", basePos: [-3.4, 0.7, 0.4], color: "#06B6D4" as const, id: "cloud", icon: "☁" },
-        { label: "AI", basePos: [0.4, 2.8, 1.3], color: "#EC4899" as const, id: "ai", icon: "✦" },
-        { label: "DATA", basePos: [0.4, -2.8, 1.3], color: "#10B981" as const, id: "data", icon: "◫" },
-      ].map((mod) => {
-        const isActive = activeModule === mod.id;
-        const expand = 1 + scrollProgress * 0.4;
-        const pos: [number, number, number] = [mod.basePos[0] * expand, mod.basePos[1] * expand, mod.basePos[2]];
-        return (
-          <Float key={mod.label} speed={isActive ? 2.8 : 1.6} floatIntensity={isActive ? 1.2 : 0.5} rotationIntensity={0.3}>
-            <group position={pos}>
-              <mesh>
-                <boxGeometry args={[1.0, 1.0, 0.25]} />
-                <meshStandardMaterial
-                  color={isActive ? mod.color : "#181825"}
-                  emissive={mod.color}
-                  emissiveIntensity={isActive ? 3.2 : 0.8}
-                  transparent
-                  opacity={0.96}
-                  roughness={0.25}
-                  metalness={0.6}
-                />
-              </mesh>
-              {/* Black backing for text - ensures readability */}
-              <mesh position={[0, 0, 0.16]}>
-                <planeGeometry args={[0.8, 0.6]} />
-                <meshBasicMaterial color="black" transparent opacity={0.85} />
-              </mesh>
-              {/* Icon + Label INSIDE - clearly in front of box (z=0.17) with thick outline */}
-              <Billboard>
-                <Text
-                  position={[0, 0.15, 0.18]}
-                  fontSize={0.38}
-                  color="white"
-                  anchorX="center"
-                  anchorY="middle"
-                  outlineWidth={0.06}
-                  outlineColor="black"
-                >
-                  {mod.icon}
-                </Text>
-                <Text
-                  position={[0, -0.2, 0.18]}
-                  fontSize={0.18}
-                  color="white"
-                  anchorX="center"
-                  anchorY="middle"
-                  outlineWidth={0.05}
-                  outlineColor="black"
-                >
-                  {mod.label}
-                </Text>
-              </Billboard>
-              {isActive && (
-                <>
-                  <mesh position={[0, 0, -0.18]}>
-                    <planeGeometry args={[1.9, 1.9]} />
-                    <meshBasicMaterial color={mod.color} transparent opacity={0.4} />
-                  </mesh>
-                  <mesh position={[0, 0, -0.4]}>
-                    <planeGeometry args={[2.9, 2.9]} />
-                    <meshBasicMaterial color={mod.color} transparent opacity={0.18} />
-                  </mesh>
-                </>
-              )}
-            </group>
-          </Float>
-        );
-      })}
+      {/* Cuboids removed per user request - leaving only rings + cores for clean high-quality look */}
 
       {/* High-density sparkles - density increases with scroll */}
       <Sparkles count={120 + Math.floor(scrollProgress * 80)} scale={5.5 + scrollProgress * 2} size={1.0 + scrollProgress * 0.3} speed={0.5 + scrollProgress * 0.3} opacity={0.8} color="#8B5CF6" />
@@ -266,16 +196,7 @@ export default function ComputationalCore({ activeModule, scrollProgress = 0 }: 
         <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.6 + scrollProgress * 0.8} minPolarAngle={Math.PI / 2.8} maxPolarAngle={Math.PI / 1.8} />
       </Canvas>
 
-      {/* High-quality overlays */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 text-[11px] font-mono font-bold tracking-widest text-white/80 bg-black/70 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.6)]">
-        <span className={`transition-all px-1 ${activeModule === "software" ? "text-[#8B5CF6] scale-110 bg-[#8B5CF6]/20 rounded-full" : "hover:text-white"}`}>CODE</span>
-        <span className="opacity-30">•</span>
-        <span className={`transition-all px-1 ${activeModule === "cloud" ? "text-[#06B6D4] scale-110 bg-[#06B6D4]/20 rounded-full" : "hover:text-white"}`}>CLOUD</span>
-        <span className="opacity-30">•</span>
-        <span className={`transition-all px-1 ${activeModule === "ai" ? "text-[#EC4899] scale-110 bg-[#EC4899]/20 rounded-full" : "hover:text-white"}`}>AI</span>
-        <span className="opacity-30">•</span>
-        <span className={`transition-all px-1 ${activeModule === "data" ? "text-[#10B981] scale-110 bg-[#10B981]/20 rounded-full" : "hover:text-white"}`}>DATA</span>
-      </div>
+      {/* Clean - no cuboid labels, only rings + cores per user request */}
 
       <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center">
         <div className="flex items-center gap-2.5 text-[11px] font-mono font-bold tracking-widest text-white bg-[#8B5CF6]/25 border border-[#8B5CF6]/50 px-4 py-2 rounded-full backdrop-blur-md shadow-[0_0_25px_rgba(139,92,246,0.4)]">
