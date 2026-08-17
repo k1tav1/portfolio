@@ -59,7 +59,6 @@ export default function AIPortfolioAssistant() {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#06B6D4] flex items-center justify-center text-[12px] font-bold">AI</div>
           <div>
             <div className="font-semibold text-[14px] tracking-tight">ASK DERICK'S AI</div>
-            <div className="font-mono text-[11px] text-white/40 -mt-0.5">Grounded • No hallucinations • V1 local knowledge, V2 OpenAI Agents SDK</div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -118,9 +117,7 @@ export default function AIPortfolioAssistant() {
         </button>
       </div>
 
-      <div className="px-5 pb-3 font-mono text-[10px] leading-4 text-white/20 text-center">
-        AI disclosure: This assistant uses controlled knowledge base. Never invents employers, skills, metrics. If info unavailable, says so. V2 will use OpenAI Agents SDK with tools, guardrails, streaming, rate limiting.
-      </div>
+
     </div>
   );
 }
