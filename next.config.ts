@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // For Docker DevOps Lab, set DOCKER_BUILD=1 to enable standalone output
+  // Vercel does NOT need standalone - it breaks on Turbopack, so we disable by default
+  ...(process.env.DOCKER_BUILD ? { output: "standalone" as const } : {}),
   allowedDevOrigins: [
     "*.e2b.app",
     "*.e2b.dev",
