@@ -136,7 +136,7 @@ export default function Home() {
 
           <motion.div style={{ scale: coreScale, y: coreY, rotate: coreRotate }} className="order-1 lg:order-2 lg:sticky lg:top-24">
             <div className="relative">
-              <ComputationalCore activeModule={activeModule} />
+              <ComputationalCore activeModule={activeModule} scrollProgress={Math.min(scrollY / 800, 1)} />
               <div className="absolute inset-0 z-20 grid grid-cols-2 grid-rows-2 gap-2 p-8 pointer-events-none">
                 <button onClick={() => scrollToSection("software")} className="pointer-events-auto rounded-xl bg-[#8B5CF6]/0 hover:bg-[#8B5CF6]/10 border border-transparent hover:border-[#8B5CF6]/30 transition flex items-end p-2"><span className="font-mono text-[10px] text-white/0 hover:text-[#8B5CF6]">→ SOFTWARE</span></button>
                 <button onClick={() => scrollToSection("cloud")} className="pointer-events-auto rounded-xl bg-[#06B6D4]/0 hover:bg-[#06B6D4]/10 border border-transparent hover:border-[#06B6D4]/30 transition flex items-end justify-end p-2"><span className="font-mono text-[10px] text-white/0 hover:text-[#06B6D4]">CLOUD →</span></button>
