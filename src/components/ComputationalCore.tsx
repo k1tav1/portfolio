@@ -130,51 +130,56 @@ function Core({ activeModule, scrollProgress }: { activeModule: string | null; s
         </mesh>
       </Float>
 
-      {/* Modules - with icons/text inside for clarity */}
+      {/* Modules - with icons/text inside - clearly in front, no clipping */}
       {[
-        { label: "CODE", basePos: [3.0, 0.6, 0.3], color: "#8B5CF6" as const, id: "software", icon: "◧", sub: "{ }" },
-        { label: "CLOUD", basePos: [-3.0, 0.6, 0.3], color: "#06B6D4" as const, id: "cloud", icon: "☁", sub: "☁" },
-        { label: "AI", basePos: [0.3, 2.4, 1.2], color: "#EC4899" as const, id: "ai", icon: "✦", sub: "AI" },
-        { label: "DATA", basePos: [0.3, -2.4, 1.2], color: "#10B981" as const, id: "data", icon: "◫", sub: "DB" },
+        { label: "CODE", basePos: [3.4, 0.7, 0.4], color: "#8B5CF6" as const, id: "software", icon: "◧" },
+        { label: "CLOUD", basePos: [-3.4, 0.7, 0.4], color: "#06B6D4" as const, id: "cloud", icon: "☁" },
+        { label: "AI", basePos: [0.4, 2.8, 1.3], color: "#EC4899" as const, id: "ai", icon: "✦" },
+        { label: "DATA", basePos: [0.4, -2.8, 1.3], color: "#10B981" as const, id: "data", icon: "◫" },
       ].map((mod) => {
         const isActive = activeModule === mod.id;
-        const expand = 1 + scrollProgress * 0.5;
+        const expand = 1 + scrollProgress * 0.4;
         const pos: [number, number, number] = [mod.basePos[0] * expand, mod.basePos[1] * expand, mod.basePos[2]];
         return (
-          <Float key={mod.label} speed={isActive ? 3.5 : 1.8 + scrollProgress} floatIntensity={isActive ? 1.4 : 0.6 + scrollProgress * 0.3} rotationIntensity={0.4 + scrollProgress * 0.2}>
+          <Float key={mod.label} speed={isActive ? 2.8 : 1.6} floatIntensity={isActive ? 1.2 : 0.5} rotationIntensity={0.3}>
             <group position={pos}>
               <mesh>
-                <boxGeometry args={[0.9 + scrollProgress * 0.1, 0.9 + scrollProgress * 0.1, 0.22]} />
+                <boxGeometry args={[1.0, 1.0, 0.25]} />
                 <meshStandardMaterial
-                  color={isActive ? mod.color : "#15151F"}
+                  color={isActive ? mod.color : "#181825"}
                   emissive={mod.color}
-                  emissiveIntensity={isActive ? 2.8 + scrollProgress : 0.6 + scrollProgress * 0.5}
+                  emissiveIntensity={isActive ? 3.2 : 0.8}
                   transparent
-                  opacity={isActive ? 1 : 0.92}
-                  roughness={0.2}
-                  metalness={0.8}
+                  opacity={0.96}
+                  roughness={0.25}
+                  metalness={0.6}
                 />
               </mesh>
-              {/* Icon + Label inside cuboid - always visible */}
+              {/* Black backing for text - ensures readability */}
+              <mesh position={[0, 0, 0.16]}>
+                <planeGeometry args={[0.8, 0.6]} />
+                <meshBasicMaterial color="black" transparent opacity={0.85} />
+              </mesh>
+              {/* Icon + Label INSIDE - clearly in front of box (z=0.17) with thick outline */}
               <Billboard>
                 <Text
-                  position={[0, 0.12, 0.14]}
-                  fontSize={0.32}
+                  position={[0, 0.15, 0.18]}
+                  fontSize={0.38}
                   color="white"
                   anchorX="center"
                   anchorY="middle"
-                  outlineWidth={0.04}
+                  outlineWidth={0.06}
                   outlineColor="black"
                 >
                   {mod.icon}
                 </Text>
                 <Text
-                  position={[0, -0.22, 0.14]}
-                  fontSize={0.14}
+                  position={[0, -0.2, 0.18]}
+                  fontSize={0.18}
                   color="white"
                   anchorX="center"
                   anchorY="middle"
-                  outlineWidth={0.025}
+                  outlineWidth={0.05}
                   outlineColor="black"
                 >
                   {mod.label}
@@ -182,12 +187,12 @@ function Core({ activeModule, scrollProgress }: { activeModule: string | null; s
               </Billboard>
               {isActive && (
                 <>
-                  <mesh position={[0, 0, -0.15]}>
-                    <planeGeometry args={[1.8 + scrollProgress * 0.5, 1.8 + scrollProgress * 0.5]} />
+                  <mesh position={[0, 0, -0.18]}>
+                    <planeGeometry args={[1.9, 1.9]} />
                     <meshBasicMaterial color={mod.color} transparent opacity={0.4} />
                   </mesh>
-                  <mesh position={[0, 0, -0.35]}>
-                    <planeGeometry args={[2.8 + scrollProgress, 2.8 + scrollProgress]} />
+                  <mesh position={[0, 0, -0.4]}>
+                    <planeGeometry args={[2.9, 2.9]} />
                     <meshBasicMaterial color={mod.color} transparent opacity={0.18} />
                   </mesh>
                 </>
@@ -232,37 +237,21 @@ export default function ComputationalCore({ activeModule, scrollProgress = 0 }: 
       {/* Scroll-emergent third glow */}
       <div className="absolute top-[20%] left-[20%] w-[180px] h-[180px] bg-[#10B981]/15 blur-[40px] rounded-full pointer-events-none transition-all duration-700" style={{ opacity: scrollProgress, transform: `scale(${scrollProgress})` }} />
 
-      {/* CSS FALLBACK - high quality complex scroll morph */}
+      {/* CSS FALLBACK - high quality complex scroll morph - NO module labels here (WebGL has icons inside now) */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="relative" style={{ transform: `scale(${1 + scrollProgress * 0.15}) rotate(${scrollProgress * 10}deg)` }}>
-          {/* 5 orbital rings with scroll expansion */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-700" style={{ width: `${180 + scrollProgress * 40}px`, height: `${180 + scrollProgress * 40}px`, borderColor: `rgba(139,92,246,${0.4 + scrollProgress * 0.2})`, borderWidth: `${1 + scrollProgress}px` }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-700" style={{ width: `${220 + scrollProgress * 60}px`, height: `${220 + scrollProgress * 60}px`, borderColor: `rgba(6,182,214,${0.3 + scrollProgress * 0.2})`, transform: `translate(-50%, -50%) rotateX(70deg)` } as any} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] border border-[#EC4899]/20 rounded-full transition-all duration-700" style={{ width: `${260 + scrollProgress * 80}px`, height: `${260 + scrollProgress * 80}px` }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-700" style={{ width: `${300 + scrollProgress * 100}px`, height: `${300 + scrollProgress * 100}px`, borderColor: `rgba(16,185,129,${0.15 + scrollProgress * 0.1})` }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 transition-all duration-700" style={{ width: `${340 + scrollProgress * 120}px`, height: `${340 + scrollProgress * 120}px`, opacity: scrollProgress }} />
+        <div className="relative" style={{ transform: `scale(${1 + scrollProgress * 0.1}) rotate(${scrollProgress * 6}deg)` }}>
+          {/* 4 orbital rings - subtle, not overlapping labels */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-700" style={{ width: `${160 + scrollProgress * 20}px`, height: `${160 + scrollProgress * 20}px`, borderColor: `rgba(139,92,246,0.25)`, borderWidth: `1px` }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-700" style={{ width: `${200 + scrollProgress * 30}px`, height: `${200 + scrollProgress * 30}px`, borderColor: `rgba(6,182,214,0.2)`, transform: `translate(-50%, -50%) rotateX(70deg)` } as any} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] border border-[#EC4899]/15 rounded-full transition-all duration-700" style={{ width: `${240 + scrollProgress * 40}px`, height: `${240 + scrollProgress * 40}px` }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-700" style={{ width: `${280 + scrollProgress * 50}px`, height: `${280 + scrollProgress * 50}px`, borderColor: `rgba(16,185,129,0.12)` }} />
 
-          {/* Central orb - morphs with scroll */}
-          <div className="relative flex items-center justify-center" style={{ width: `${96 + scrollProgress * 24}px`, height: `${96 + scrollProgress * 24}px` }}>
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#8B5CF6] via-[#A855F7] to-[#06B6D4] blur-[2px] opacity-100 animate-pulse transition-all duration-700" style={{ filter: `blur(${2 + scrollProgress * 3}px)` }} />
-            <div className="absolute inset-[2px] rounded-full bg-[#07080A] border-2 border-white/20 transition-all" style={{ borderWidth: `${2 + scrollProgress * 2}px` }} />
-            <div className="absolute inset-[14px] rounded-full bg-[#8B5CF6] blur-[12px] opacity-80 animate-pulse" />
-            <div className="absolute inset-[22px] rounded-full bg-[#06B6D4] blur-[8px] opacity-60" />
-            <div className="relative rounded-full bg-white shadow-[0_0_30px_#8B5CF6,0_0_60px_#8B5CF6,0_0_90px_#06B6D4] animate-pulse transition-all" style={{ width: `${16 + scrollProgress * 8}px`, height: `${16 + scrollProgress * 8}px`, boxShadow: `0 0 ${30 + scrollProgress * 20}px #8B5CF6, 0 0 ${60 + scrollProgress * 30}px #8B5CF6, 0 0 ${90 + scrollProgress * 40}px #06B6D4` } as any} />
-          </div>
-
-          {/* Modules - expand with scroll */}
-          <div className={`absolute px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest flex items-center gap-1.5 transition-all ${activeModule === "software" ? "border-[#8B5CF6] text-white bg-[#8B5CF6] shadow-[0_0_25px_rgba(139,92,246,0.8)] scale-110 z-10" : "border-white/20 text-white/70"}`} style={{ right: `${-92 - scrollProgress * 20}px`, top: `${4 - scrollProgress * 10}px` }}>
-            <span>◧</span> CODE
-          </div>
-          <div className={`absolute px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest flex items-center gap-1.5 transition-all ${activeModule === "cloud" ? "border-[#06B6D4] text-white bg-[#06B6D4] shadow-[0_0_25px_rgba(6,182,214,0.8)] scale-110 z-10" : "border-white/20 text-white/70"}`} style={{ left: `${-96 - scrollProgress * 20}px`, top: `${4 - scrollProgress * 10}px` }}>
-            <span>☁</span> CLOUD
-          </div>
-          <div className={`absolute left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest flex items-center gap-1.5 transition-all ${activeModule === "ai" ? "border-[#EC4899] text-white bg-[#EC4899] shadow-[0_0_25px_rgba(236,72,153,0.8)] scale-110 z-10" : "border-white/20 text-white/70"}`} style={{ top: `${-68 - scrollProgress * 20}px` }}>
-            <span>✦</span> AI CORE
-          </div>
-          <div className={`absolute left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest flex items-center gap-1.5 transition-all ${activeModule === "data" ? "border-[#10B981] text-white bg-[#10B981] shadow-[0_0_25px_rgba(16,185,129,0.8)] scale-110 z-10" : "border-white/20 text-white/70"}`} style={{ bottom: `${-68 - scrollProgress * 20}px` }}>
-            <span>◫</span> DATA
+          {/* Central orb - limited max scale to avoid covering labels */}
+          <div className="relative flex items-center justify-center" style={{ width: `${80 + scrollProgress * 12}px`, height: `${80 + scrollProgress * 12}px` }}>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#8B5CF6] via-[#A855F7] to-[#06B6D4] blur-[2px] opacity-90 animate-pulse transition-all duration-700" style={{ filter: `blur(${2 + scrollProgress * 2}px)` }} />
+            <div className="absolute inset-[2px] rounded-full bg-[#07080A] border-2 border-white/20 transition-all" style={{ borderWidth: `${2}px` }} />
+            <div className="absolute inset-[12px] rounded-full bg-[#8B5CF6] blur-[10px] opacity-70 animate-pulse" />
+            <div className="relative rounded-full bg-white shadow-[0_0_20px_#8B5CF6,0_0_40px_#8B5CF6] animate-pulse transition-all" style={{ width: `${12 + scrollProgress * 4}px`, height: `${12 + scrollProgress * 4}px` }} />
           </div>
         </div>
       </div>
