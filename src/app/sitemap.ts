@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { projects } from "@/data/portfolio";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://derick-kitavi.vercel.app"; // TODO: Replace with your actual Vercel URL after deployment
+  const baseUrl = "https://portfolio-k1tav1.vercel.app"; // Vercel auto URL - replace with custom domain after setup
 
   const projectUrls = projects.map((p) => ({
     url: `${baseUrl}/projects/${p.id}`,

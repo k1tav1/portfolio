@@ -1,0 +1,61 @@
+name: CI - Build & Test Portfolio (DevOps Lab Phase 2)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint || echo "No lint script or warnings - continuing"
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Check build output
+        run: |
+          ls -lh .next/
+          echo "Build successful - ready for Docker and AWS deployment"
+
+      # Future: Add Playwright tests here
+      # - name: Install Playwright
+      #   run: npx playwright install --with-deps
+      # - name: Run E2E tests
+      #   run: npx playwright test
+
+      # Future: Build and push Docker image to GHCR/ECR
+      # - name: Build Docker image
+      #   run: docker build -t ghcr.io/k1tav1/portfolio:${{ github.sha }} .
+      # - name: Push to GHCR
+      #   run: |
+      #     echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      #     docker push ghcr.io/k1tav1/portfolio:${{ github.sha }}
+
+  # Future job: Deploy to AWS (uncomment when ready for DevOps lab)
+  # deploy-aws:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: Deploy to ECS/EC2
+  #       run: echo "Deploy to AWS - to be implemented as part of DevOps learning"
