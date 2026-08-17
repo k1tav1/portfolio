@@ -8,176 +8,248 @@ import * as THREE from "three";
 function Core({ activeModule }: { activeModule: string | null }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
+    const isActive = !!activeModule;
+    const speed = isActive ? 0.35 : 0.15;
+    
     if (meshRef.current) {
-      meshRef.current.rotation.y = t * 0.15;
-      meshRef.current.rotation.x = Math.sin(t * 0.3) * 0.1;
+      meshRef.current.rotation.y = t * speed;
+      meshRef.current.rotation.x = Math.sin(t * 0.3) * 0.15;
+      meshRef.current.rotation.z = Math.cos(t * 0.2) * 0.05;
     }
     if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.05;
+      groupRef.current.rotation.y = t * 0.08;
+      // Pulsate scale slightly when active
+      const scale = isActive ? 1 + Math.sin(t * 3) * 0.03 : 1;
+      groupRef.current.scale.set(scale, scale, scale);
+    }
+    if (glowRef.current) {
+      const glowScale = 1 + Math.sin(t * 2) * 0.15;
+      glowRef.current.scale.set(glowScale, glowScale, glowScale);
     }
   });
 
   return (
     <group ref={groupRef}>
-      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+      <Float speed={2} rotationIntensity={0.3} floatIntensity={0.6}>
+        {/* Outer wireframe - more vibrant */}
         <mesh ref={meshRef}>
-          <icosahedronGeometry args={[1.2, 1]} />
+          <icosahedronGeometry args={[1.3, 2]} />
           <meshStandardMaterial
-            color="#8B5CF6"
+            color="#A855F7"
             emissive="#8B5CF6"
-            emissiveIntensity={0.8}
+            emissiveIntensity={1.8}
             wireframe
+            transparent
+            opacity={1}
+          />
+        </mesh>
+        {/* Middle shell - dark with glow */}
+        <mesh>
+          <sphereGeometry args={[0.85, 32, 32]} />
+          <meshStandardMaterial
+            color="#0A0A0F"
+            emissive="#8B5CF6"
+            emissiveIntensity={0.5}
+            roughness={0.15}
+            metalness={0.9}
+          />
+        </mesh>
+        {/* Inner core - super vibrant cyan */}
+        <mesh ref={glowRef}>
+          <sphereGeometry args={[0.48, 32, 32]} />
+          <meshStandardMaterial
+            color="#06B6D4"
+            emissive="#06B6D4"
+            emissiveIntensity={2.5}
             transparent
             opacity={0.9}
           />
         </mesh>
+        {/* Innermost bright dot */}
         <mesh>
-          <sphereGeometry args={[0.8, 32, 32]} />
-          <meshStandardMaterial
-            color="#07080A"
-            emissive="#8B5CF6"
-            emissiveIntensity={0.15}
-            roughness={0.2}
-            metalness={0.8}
-          />
-        </mesh>
-        <mesh>
-          <sphereGeometry args={[0.5, 32, 32]} />
-          <meshStandardMaterial
-            color="#06B6D4"
-            emissive="#06B6D4"
-            emissiveIntensity={1.2}
-            transparent
-            opacity={0.6}
-          />
+          <sphereGeometry args={[0.18, 16, 16]} />
+          <meshBasicMaterial color="#FFFFFF" transparent opacity={0.9} />
         </mesh>
       </Float>
 
-      <Ring args={[1.6, 1.65, 64]} rotation={[Math.PI / 2.5, 0, 0]}>
-        <meshStandardMaterial color="#8B5CF6" transparent opacity={0.3} side={THREE.DoubleSide} emissive="#8B5CF6" emissiveIntensity={0.5} />
+      {/* Orbital rings - more vibrant, more rings */}
+      <Ring args={[1.65, 1.7, 64]} rotation={[Math.PI / 2.5, 0, 0]}>
+        <meshStandardMaterial color="#8B5CF6" transparent opacity={0.6} side={THREE.DoubleSide} emissive="#8B5CF6" emissiveIntensity={1.2} />
       </Ring>
-      <Ring args={[2.0, 2.05, 64]} rotation={[0, Math.PI / 3, 0]}>
-        <meshStandardMaterial color="#06B6D4" transparent opacity={0.25} side={THREE.DoubleSide} emissive="#06B6D4" emissiveIntensity={0.4} />
+      <Ring args={[2.05, 2.1, 64]} rotation={[0, Math.PI / 3, 0]}>
+        <meshStandardMaterial color="#06B6D4" transparent opacity={0.5} side={THREE.DoubleSide} emissive="#06B6D4" emissiveIntensity={1.0} />
       </Ring>
-      <Ring args={[2.4, 2.45, 64]} rotation={[Math.PI / 1.5, 0, Math.PI / 4]}>
-        <meshStandardMaterial color="#A855F7" transparent opacity={0.15} side={THREE.DoubleSide} />
+      <Ring args={[2.45, 2.5, 64]} rotation={[Math.PI / 1.5, 0, Math.PI / 4]}>
+        <meshStandardMaterial color="#EC4899" transparent opacity={0.35} side={THREE.DoubleSide} emissive="#EC4899" emissiveIntensity={0.8} />
+      </Ring>
+      <Ring args={[2.85, 2.9, 48]} rotation={[Math.PI / 4, Math.PI / 2, 0]}>
+        <meshStandardMaterial color="#10B981" transparent opacity={0.25} side={THREE.DoubleSide} emissive="#10B981" emissiveIntensity={0.6} />
       </Ring>
 
+      {/* Modules - more vibrant */}
       {[
-        { label: "CODE", pos: [2.8, 0.5, 0], color: "#8B5CF6" as const, id: "software" },
-        { label: "CLOUD", pos: [-2.8, 0.5, 0], color: "#06B6D4" as const, id: "cloud" },
-        { label: "AI", pos: [0, 2.2, 1], color: "#EC4899" as const, id: "ai" },
-        { label: "DATA", pos: [0, -2.2, 1], color: "#10B981" as const, id: "data" },
+        { label: "CODE", pos: [3.0, 0.6, 0.3], color: "#8B5CF6" as const, id: "software", icon: "◧" },
+        { label: "CLOUD", pos: [-3.0, 0.6, 0.3], color: "#06B6D4" as const, id: "cloud", icon: "☁" },
+        { label: "AI", pos: [0.3, 2.4, 1.2], color: "#EC4899" as const, id: "ai", icon: "✦" },
+        { label: "DATA", pos: [0.3, -2.4, 1.2], color: "#10B981" as const, id: "data", icon: "◫" },
       ].map((mod) => {
         const isActive = activeModule === mod.id;
         return (
-          <Float key={mod.label} speed={2} floatIntensity={0.8} rotationIntensity={0.3}>
+          <Float key={mod.label} speed={isActive ? 3 : 1.8} floatIntensity={isActive ? 1.2 : 0.6} rotationIntensity={0.4}>
             <group position={mod.pos as [number, number, number]}>
+              {/* Module box - vibrant */}
               <mesh>
-                <boxGeometry args={[0.7, 0.7, 0.15]} />
+                <boxGeometry args={[0.8, 0.8, 0.18]} />
                 <meshStandardMaterial
-                  color={isActive ? mod.color : "#1A1C22"}
+                  color={isActive ? mod.color : "#15151F"}
                   emissive={mod.color}
-                  emissiveIntensity={isActive ? 1 : 0.25}
+                  emissiveIntensity={isActive ? 2.0 : 0.4}
                   transparent
-                  opacity={isActive ? 0.95 : 0.8}
-                  roughness={0.3}
-                  metalness={0.6}
+                  opacity={isActive ? 1 : 0.85}
+                  roughness={0.2}
+                  metalness={0.8}
                 />
               </mesh>
+              {/* Active glow plane */}
               {isActive && (
-                <mesh position={[0, 0, -0.1]}>
-                  <planeGeometry args={[1.2, 1.2]} />
-                  <meshBasicMaterial color={mod.color} transparent opacity={0.2} />
-                </mesh>
+                <>
+                  <mesh position={[0, 0, -0.15]}>
+                    <planeGeometry args={[1.6, 1.6]} />
+                    <meshBasicMaterial color={mod.color} transparent opacity={0.3} />
+                  </mesh>
+                  <mesh position={[0, 0, -0.25]}>
+                    <planeGeometry args={[2.2, 2.2]} />
+                    <meshBasicMaterial color={mod.color} transparent opacity={0.12} />
+                  </mesh>
+                </>
               )}
+              {/* Connection line to center */}
+              <mesh position={[mod.id === "software" ? -0.9 : mod.id === "cloud" ? 0.9 : 0, mod.id === "ai" ? -0.7 : mod.id === "data" ? 0.7 : 0, -0.2]}>
+                <boxGeometry args={[mod.id === "software" || mod.id === "cloud" ? 1.2 : 0.04, mod.id === "ai" || mod.id === "data" ? 1.2 : 0.04, 0.02]} />
+                <meshBasicMaterial color={mod.color} transparent opacity={isActive ? 0.8 : 0.25} />
+              </mesh>
             </group>
           </Float>
         );
       })}
 
-      <Sparkles count={80} scale={5} size={0.8} speed={0.3} opacity={0.6} color="#8B5CF6" />
-      <Sparkles count={40} scale={4} size={0.5} speed={0.2} opacity={0.4} color="#06B6D4" />
+      {/* More vibrant sparkles */}
+      <Sparkles count={120} scale={5.5} size={1.0} speed={0.5} opacity={0.8} color="#8B5CF6" />
+      <Sparkles count={80} scale={4.5} size={0.7} speed={0.35} opacity={0.6} color="#06B6D4" />
+      <Sparkles count={50} scale={4} size={0.6} speed={0.4} opacity={0.5} color="#EC4899" />
+      <Sparkles count={30} scale={6} size={1.2} speed={0.2} opacity={0.4} color="#FFFFFF" />
     </group>
   );
 }
 
 export default function ComputationalCore({ activeModule }: { activeModule: string | null }) {
   return (
-    <div className="relative w-full h-[420px] sm:h-[500px] lg:h-[600px] overflow-hidden rounded-[32px] bg-[#07080A] border border-white/[0.08]">
-      {/* CSS FALLBACK - always visible */}
+    <div className="relative w-full h-[460px] sm:h-[540px] lg:h-[640px] overflow-hidden rounded-[32px] bg-[#07080A] border border-white/[0.10] shadow-[0_0_0_1px_rgba(139,92,246,0.1),0_0_80px_rgba(139,92,246,0.15)] group">
+      {/* Vibrant grid background */}
+      <div
+        className="absolute inset-0 opacity-[0.12]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(139,92,246,0.6) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(6,182,214,0.4) 1.5px, transparent 1.5px)`,
+          backgroundSize: "28px 28px",
+        }}
+      />
+
+      {/* More vibrant glows */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] bg-[#8B5CF6]/40 blur-[80px] rounded-full pointer-events-none animate-pulse" />
+      <div className="absolute top-1/3 right-1/3 w-[240px] h-[240px] bg-[#06B6D4]/30 blur-[60px] rounded-full pointer-events-none animate-pulse" style={{ animationDelay: "0.7s" }} />
+      <div className="absolute bottom-1/3 left-1/3 w-[200px] h-[200px] bg-[#EC4899]/20 blur-[50px] rounded-full pointer-events-none animate-pulse" style={{ animationDelay: "1.4s" }} />
+
+      {/* CSS FALLBACK - more vibrant */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        {/* Grid */}
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(139,92,246,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.4) 1px, transparent 1px)`,
-            backgroundSize: "28px 28px",
-          }}
-        />
-        {/* Central glow */}
-        <div className="absolute w-[220px] h-[220px] bg-[#8B5CF6]/30 blur-[60px] rounded-full animate-pulse" />
-        <div className="absolute w-[140px] h-[140px] bg-[#06B6D4]/20 blur-[40px] rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
-
-        {/* CSS Core - visible even if WebGL fails */}
+        {/* Central orb CSS - more vibrant */}
         <div className="relative">
-          {/* Orbital rings - CSS */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[160px] border border-[#8B5CF6]/30 rounded-full animate-[spin_8s_linear_infinite]" style={{ transform: "translate(-50%, -50%) rotateX(70deg)" }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] border border-[#06B6D4]/20 rounded-full animate-[spin_12s_linear_infinite_reverse]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] border border-[#A855F7]/10 rounded-full animate-[spin_20s_linear_infinite]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] border border-[#8B5CF6]/40 rounded-full animate-[spin_8s_linear_infinite] shadow-[0_0_30px_rgba(139,92,246,0.3)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] h-[220px] border border-[#06B6D4]/30 rounded-full animate-[spin_12s_linear_infinite_reverse] shadow-[0_0_20px_rgba(6,182,214,0.2)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] border border-[#EC4899]/20 rounded-full animate-[spin_20s_linear_infinite]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] border border-[#10B981]/15 rounded-full animate-[spin_25s_linear_infinite_reverse]" />
 
-          {/* Central orb CSS */}
-          <div className="relative w-[88px] h-[88px] flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#06B6D4] blur-[1px] opacity-90" />
-            <div className="absolute inset-[3px] rounded-full bg-[#07080A] border border-white/10" />
-            <div className="absolute inset-[12px] rounded-full bg-[#8B5CF6] blur-[8px] opacity-60 animate-pulse" />
-            <div className="relative w-3 h-3 rounded-full bg-white shadow-[0_0_20px_#8B5CF6,0_0_40px_#8B5CF6]" />
+          <div className="relative w-[96px] h-[96px] flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#8B5CF6] via-[#A855F7] to-[#06B6D4] blur-[2px] opacity-100 animate-pulse" />
+            <div className="absolute inset-[2px] rounded-full bg-[#07080A] border-2 border-white/20" />
+            <div className="absolute inset-[14px] rounded-full bg-[#8B5CF6] blur-[12px] opacity-80 animate-pulse" />
+            <div className="absolute inset-[22px] rounded-full bg-[#06B6D4] blur-[8px] opacity-60 animate-pulse" style={{ animationDelay: "0.5s" }} />
+            <div className="relative w-4 h-4 rounded-full bg-white shadow-[0_0_30px_#8B5CF6,0_0_60px_#8B5CF6,0_0_90px_#06B6D4] animate-pulse" />
           </div>
 
-          {/* Modules CSS - positioned around */}
-          <div className={`absolute -right-[88px] top-2 px-2.5 py-1 rounded-lg bg-[#1A1C22] border text-[10px] font-mono tracking-widest transition-all ${activeModule === "software" ? "border-[#8B5CF6] text-[#8B5CF6] shadow-[0_0_15px_rgba(139,92,246,0.5)] scale-110" : "border-white/10 text-white/60"}`}>CODE</div>
-          <div className={`absolute -left-[92px] top-2 px-2.5 py-1 rounded-lg bg-[#1A1C22] border text-[10px] font-mono tracking-widest transition-all ${activeModule === "cloud" ? "border-[#06B6D4] text-[#06B6D4] shadow-[0_0_15px_rgba(6,182,214,0.5)] scale-110" : "border-white/10 text-white/60"}`}>CLOUD</div>
-          <div className={`absolute left-1/2 -translate-x-1/2 -top-[64px] px-2.5 py-1 rounded-lg bg-[#1A1C22] border text-[10px] font-mono tracking-widest transition-all ${activeModule === "ai" ? "border-[#EC4899] text-[#EC4899] shadow-[0_0_15px_rgba(236,72,153,0.5)] scale-110" : "border-white/10 text-white/60"}`}>AI CORE</div>
-          <div className={`absolute left-1/2 -translate-x-1/2 -bottom-[64px] px-2.5 py-1 rounded-lg bg-[#1A1C22] border text-[10px] font-mono tracking-widest transition-all ${activeModule === "data" ? "border-[#10B981] text-[#10B981] shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110" : "border-white/10 text-white/60"}`}>DATA</div>
+          {/* Modules CSS - more vibrant, user friendly with icons */}
+          <div className={`absolute -right-[92px] top-1 px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest transition-all flex items-center gap-1.5 ${activeModule === "software" ? "border-[#8B5CF6] text-white bg-[#8B5CF6] shadow-[0_0_25px_rgba(139,92,246,0.8)] scale-110" : "border-white/20 text-white/70 hover:border-[#8B5CF6]/50 hover:text-white"}`}>
+            <span>◧</span> CODE
+          </div>
+          <div className={`absolute -left-[96px] top-1 px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest transition-all flex items-center gap-1.5 ${activeModule === "cloud" ? "border-[#06B6D4] text-white bg-[#06B6D4] shadow-[0_0_25px_rgba(6,182,214,0.8)] scale-110" : "border-white/20 text-white/70 hover:border-[#06B6D4]/50 hover:text-white"}`}>
+            <span>☁</span> CLOUD
+          </div>
+          <div className={`absolute left-1/2 -translate-x-1/2 -top-[68px] px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest transition-all flex items-center gap-1.5 ${activeModule === "ai" ? "border-[#EC4899] text-white bg-[#EC4899] shadow-[0_0_25px_rgba(236,72,153,0.8)] scale-110" : "border-white/20 text-white/70 hover:border-[#EC4899]/50 hover:text-white"}`}>
+            <span>✦</span> AI CORE
+          </div>
+          <div className={`absolute left-1/2 -translate-x-1/2 -bottom-[68px] px-3 py-1.5 rounded-xl bg-[#1A1C22] border-2 text-[11px] font-mono font-bold tracking-widest transition-all flex items-center gap-1.5 ${activeModule === "data" ? "border-[#10B981] text-white bg-[#10B981] shadow-[0_0_25px_rgba(16,185,129,0.8)] scale-110" : "border-white/20 text-white/70 hover:border-[#10B981]/50 hover:text-white"}`}>
+            <span>◫</span> DATA
+          </div>
 
-          {/* Connection lines */}
-          <div className="absolute top-1/2 left-full w-[64px] h-[1px] bg-gradient-to-r from-white/20 to-transparent -translate-y-1/2" />
-          <div className="absolute top-1/2 right-full w-[64px] h-[1px] bg-gradient-to-l from-white/20 to-transparent -translate-y-1/2" />
-          <div className="absolute bottom-full left-1/2 w-[1px] h-[48px] bg-gradient-to-t from-white/20 to-transparent -translate-x-1/2" />
-          <div className="absolute top-full left-1/2 w-[1px] h-[48px] bg-gradient-to-b from-white/20 to-transparent -translate-x-1/2" />
+          {/* Vibrant connection lines with glow */}
+          <div className="absolute top-1/2 left-full w-[68px] h-[2px] bg-gradient-to-r from-[#8B5CF6] via-[#8B5CF6]/50 to-transparent -translate-y-1/2 shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
+          <div className="absolute top-1/2 right-full w-[68px] h-[2px] bg-gradient-to-l from-[#06B6D4] via-[#06B6D4]/50 to-transparent -translate-y-1/2 shadow-[0_0_10px_rgba(6,182,214,0.5)]" />
+          <div className="absolute bottom-full left-1/2 w-[2px] h-[52px] bg-gradient-to-t from-[#EC4899] via-[#EC4899]/50 to-transparent -translate-x-1/2 shadow-[0_0_10px_rgba(236,72,153,0.5)]" />
+          <div className="absolute top-full left-1/2 w-[2px] h-[52px] bg-gradient-to-b from-[#10B981] via-[#10B981]/50 to-transparent -translate-x-1/2 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
         </div>
       </div>
 
-      {/* WebGL Canvas - overlays CSS fallback */}
-      <Canvas camera={{ position: [0, 0, 6], fov: 50 }} dpr={[1, 1.5]} className="!absolute inset-0 z-10" gl={{ alpha: true, antialias: true }}>
-        <ambientLight intensity={0.6} />
-        <pointLight position={[5, 5, 5]} intensity={1} color="#8B5CF6" />
-        <pointLight position={[-5, -3, 2]} intensity={0.8} color="#06B6D4" />
+      {/* WebGL Canvas */}
+      <Canvas camera={{ position: [0, 0, 6], fov: 50 }} dpr={[1, 2]} className="!absolute inset-0 z-10" gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
+        <ambientLight intensity={0.8} />
+        <pointLight position={[5, 5, 5]} intensity={1.5} color="#8B5CF6" />
+        <pointLight position={[-5, -3, 2]} intensity={1.2} color="#06B6D4" />
+        <pointLight position={[0, 5, -3]} intensity={0.8} color="#EC4899" />
         <Core activeModule={activeModule} />
-        <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.4} minPolarAngle={Math.PI / 2.5} maxPolarAngle={Math.PI / 1.6} />
+        <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.6} minPolarAngle={Math.PI / 2.8} maxPolarAngle={Math.PI / 1.8} />
       </Canvas>
 
-      {/* Overlays */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 text-[10px] font-mono tracking-widest text-white/40 bg-black/40 backdrop-blur px-3 py-1 rounded-full border border-white/10">
-        <span className={activeModule === "software" ? "text-[#8B5CF6]" : ""}>CODE</span>
+      {/* User friendly overlays */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 text-[11px] font-mono font-bold tracking-widest text-white/70 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+        <span className={`transition-all ${activeModule === "software" ? "text-[#8B5CF6] scale-110" : "hover:text-white"}`}>CODE</span>
         <span>•</span>
-        <span className={activeModule === "cloud" ? "text-[#06B6D4]" : ""}>CLOUD</span>
+        <span className={`transition-all ${activeModule === "cloud" ? "text-[#06B6D4] scale-110" : "hover:text-white"}`}>CLOUD</span>
         <span>•</span>
-        <span className={activeModule === "ai" ? "text-[#EC4899]" : ""}>AI</span>
+        <span className={`transition-all ${activeModule === "ai" ? "text-[#EC4899] scale-110" : "hover:text-white"}`}>AI</span>
         <span>•</span>
-        <span className={activeModule === "data" ? "text-[#10B981]" : ""}>DATA</span>
+        <span className={`transition-all ${activeModule === "data" ? "text-[#10B981] scale-110" : "hover:text-white"}`}>DATA</span>
       </div>
 
+      {/* Top status - more vibrant */}
       <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center">
-        <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest text-white/60 bg-white/[0.06] border border-white/[0.08] px-3 py-1.5 rounded-full backdrop-blur">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          CORE ONLINE • HYBRID RENDER
+        <div className="flex items-center gap-2.5 text-[11px] font-mono font-bold tracking-widest text-white bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 px-4 py-2 rounded-full backdrop-blur-md shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+          CORE ONLINE • VIBRANT MODE
         </div>
-        <div className="text-[10px] font-mono text-white/30 bg-black/40 backdrop-blur px-2 py-1 rounded-full border border-white/5">CSS FALLBACK + WebGL</div>
+        <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono font-bold text-white/70 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          <span>✦ CLICK</span>
+          <span className="w-1 h-1 rounded-full bg-white/30" />
+          <span>DRAG</span>
+          <span className="w-1 h-1 rounded-full bg-white/30" />
+          <span>SCROLL</span>
+        </div>
       </div>
+
+      {/* User friendly hint - bottom left */}
+      <div className="absolute bottom-4 left-4 z-20 hidden lg:flex flex-col gap-1.5">
+        <div className="font-mono text-[10px] tracking-widest text-white/50 bg-black/40 backdrop-blur px-2.5 py-1 rounded-full border border-white/5">💡 HOVER CARDS → GLOWS</div>
+        <div className="font-mono text-[10px] tracking-widest text-white/50 bg-black/40 backdrop-blur px-2.5 py-1 rounded-full border border-white/5">🎯 CLICK MODULE → JUMP</div>
+      </div>
+
+      {/* Active module highlight pulse */}
+      {activeModule && (
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className={`absolute inset-0 opacity-[0.03] transition-all duration-500 ${activeModule === "software" ? "bg-[#8B5CF6]" : activeModule === "cloud" ? "bg-[#06B6D4]" : activeModule === "ai" ? "bg-[#EC4899]" : "bg-[#10B981]"}`} />
+        </div>
+      )}
     </div>
   );
 }

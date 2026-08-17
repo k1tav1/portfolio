@@ -37,9 +37,11 @@ export default function Home() {
   const skillsRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll();
-  const coreScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.85]);
-  const coreY = useTransform(scrollYProgress, [0, 0.5], [0, -60]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0.92]);
+  const coreScale = useTransform(scrollYProgress, [0, 0.25, 0.5], [1, 0.9, 0.75]);
+  const coreY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+  const coreRotate = useTransform(scrollYProgress, [0, 1], [0, 15]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0.85]);
+  const bgIntensity = useTransform(scrollYProgress, [0, 0.5], [0.10, 0.25]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,11 +84,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-white antialiased selection:bg-[#8B5CF6]/30">
-      <motion.div className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] z-[100] origin-left" style={{ scaleX: scrollYProgress }} />
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#8B5CF6]/10 blur-[200px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[800px] h-[800px] bg-[#06B6D4]/[0.07] blur-[200px] rounded-full" />
-      </div>
+      <motion.div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#8B5CF6] via-[#EC4899] to-[#06B6D4] z-[100] origin-left shadow-[0_0_10px_rgba(139,92,246,0.8)]" style={{ scaleX: scrollYProgress }} />
+      <motion.div className="fixed inset-0 pointer-events-none" style={{ opacity: bgIntensity }}>
+        <div className="absolute top-[-20%] left-[-10%] w-[700px] h-[700px] bg-[#8B5CF6]/20 blur-[200px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[900px] h-[900px] bg-[#06B6D4]/[0.15] blur-[200px] rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-[30%] right-[20%] w-[500px] h-[500px] bg-[#EC4899]/[0.12] blur-[150px] rounded-full animate-pulse" style={{ animationDelay: "2s" }} />
+      </motion.div>
 
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-[#050507]/80 border-b border-white/[0.06]">
         <div className="mx-auto max-w-[1280px] px-6 h-[64px] flex items-center justify-between">
@@ -131,7 +134,7 @@ export default function Home() {
             </div>
           </div>
 
-          <motion.div style={{ scale: coreScale, y: coreY }} className="order-1 lg:order-2 lg:sticky lg:top-24">
+          <motion.div style={{ scale: coreScale, y: coreY, rotate: coreRotate }} className="order-1 lg:order-2 lg:sticky lg:top-24">
             <div className="relative">
               <ComputationalCore activeModule={activeModule} />
               <div className="absolute inset-0 z-20 grid grid-cols-2 grid-rows-2 gap-2 p-8 pointer-events-none">
@@ -333,27 +336,26 @@ export default function Home() {
 
       {/* CONTACT */}
       <section id="contact" className="mx-auto max-w-[1280px] px-6 py-20 border-t border-white/[0.06]">
-        <div className="rounded-[32px] bg-gradient-to-br from-[#0E0E12] to-[#130E1F] border border-white/[0.08] p-8 lg:p-10">
-          <div className="grid lg:grid-cols-2 gap-10">
-            <div>
-              <div className="font-mono text-[11px] tracking-[0.2em] text-[#8B5CF6]">10 — LET'S BUILD SOMETHING USEFUL</div>
-              <h2 className="mt-3 text-[36px] font-bold tracking-tight leading-[0.9]">Ready to build intelligent systems?</h2>
-              <p className="mt-4 text-[14px] leading-7 text-white/50">Open to internships, entry-level, remote, contract. Focus: Software → Cloud/DevOps → AI Agents.</p>
-              <div className="mt-8 grid sm:grid-cols-2 gap-3">
-                <a href={`mailto:${personalInfo.email}`} className="flex items-center gap-3 p-4 rounded-2xl bg-white text-black"><Mail className="w-4 h-4" /><div><div className="font-mono text-[10px] text-black/50 uppercase">Email</div><div className="font-medium text-[12px]">{personalInfo.email}</div></div></a>
-                <a href={personalInfo.linkedin} target="_blank" className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.06] border border-white/[0.12]"><LinkedinIcon className="w-4 h-4" /><div><div className="font-mono text-[10px] text-white/40 uppercase">LinkedIn</div><div className="font-medium text-[12px] text-white">Derick Kitavi</div></div></a>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-[#07080A] border border-white/[0.06] p-6">
-              <div className="font-semibold">Quick Message</div>
-              <div className="font-mono text-[11px] text-white/40 mt-1">V1 mailto fallback, V2 AI-handled with rate limiting</div>
-              <div className="mt-4 p-4 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 font-mono text-[11px] text-white/60">This portfolio is Phase 3-7: Foundation ✓ Visual Identity ✓ Content ✓ Skills Graph ✓ GitHub Live ✓ AI Assistant ✓ — Next: Tests, SEO, Analytics, Deployment to Vercel, then DevOps lab (Docker → AWS).</div>
+        <div className="rounded-[32px] bg-gradient-to-br from-[#0E0E12] to-[#130E1F] border border-white/[0.08] p-8 lg:p-12 text-center">
+          <div className="max-w-[720px] mx-auto">
+            <div className="font-mono text-[11px] tracking-[0.2em] text-[#8B5CF6]">10 — LET'S BUILD SOMETHING USEFUL</div>
+            <h2 className="mt-3 text-[40px] font-bold tracking-tight leading-[0.9]">Ready to build intelligent systems?</h2>
+            <p className="mt-4 text-[15px] leading-7 text-white/50 mx-auto">Open to internships, entry-level, remote, contract. Focus: Software → Cloud/DevOps → AI Agents. Let's connect and build something useful.</p>
+            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-3 max-w-[480px] mx-auto">
+              <a href={`mailto:${personalInfo.email}`} className="flex-1 flex items-center justify-center gap-3 p-4 rounded-2xl bg-white text-black hover:bg-white/90 transition">
+                <Mail className="w-5 h-5" />
+                <div className="text-left"><div className="font-mono text-[10px] text-black/50 uppercase">Email</div><div className="font-semibold text-[13px]">{personalInfo.email}</div></div>
+              </a>
+              <a href={personalInfo.linkedin} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-4 rounded-2xl bg-white/[0.06] border border-white/[0.12] hover:bg-white/[0.10] transition">
+                <LinkedinIcon className="w-5 h-5" />
+                <div className="text-left"><div className="font-mono text-[10px] text-white/40 uppercase">LinkedIn</div><div className="font-semibold text-[13px] text-white">Derick Kitavi</div></div>
+              </a>
+              <a href={personalInfo.github} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-4 rounded-2xl bg-white/[0.06] border border-white/[0.12] hover:bg-white/[0.10] transition">
+                <GithubIcon className="w-5 h-5" />
+                <div className="text-left"><div className="font-mono text-[10px] text-white/40 uppercase">GitHub</div><div className="font-semibold text-[13px] text-white">{personalInfo.githubUsername}</div></div>
+              </a>
             </div>
           </div>
-        </div>
-        <div className="mt-12 pt-8 border-t border-white/[0.06] flex flex-col lg:flex-row justify-between gap-4 font-mono text-[11px] text-white/30">
-          <span>© 2026 DERICK KITAVI • Next.js 15 + R3F + Motion • Nairobi → Remote • Futuristic locked</span>
-          <span className="flex gap-4"><a href={personalInfo.github} target="_blank" className="hover:text-white flex items-center gap-1"><GithubIcon className="w-3 h-3" /> {personalInfo.githubUsername}</a><span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Phase 3 live</span></span>
         </div>
       </section>
     </div>
