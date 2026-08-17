@@ -96,7 +96,6 @@ export default function Home() {
             <span className="hidden sm:inline-flex ml-2 font-mono text-[9px] tracking-widest px-2 py-1 rounded-full bg-[#8B5CF6]/15 border border-[#8B5CF6]/20 text-[#8B5CF6]">FUTURISTIC • LOCKED • {Math.round(scrollY)}px</span>
           </div>
           <div className="flex items-center gap-2">
-            <a href="/professional" className="font-mono text-[11px] tracking-widest px-3 h-8 rounded-full border border-white/[0.12] hover:bg-white hover:text-black transition">↗ PRO V2</a>
             <a href="#contact" className="font-mono text-[11px] tracking-widest px-3 h-8 rounded-full bg-white text-black flex items-center">CONTACT</a>
           </div>
         </div>
