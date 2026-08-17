@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, OrbitControls, Sparkles, Ring, Torus } from "@react-three/drei";
+import { Float, OrbitControls, Sparkles, Ring, Torus, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
 
 function Core({ activeModule, scrollProgress }: { activeModule: string | null; scrollProgress: number }) {
@@ -130,12 +130,12 @@ function Core({ activeModule, scrollProgress }: { activeModule: string | null; s
         </mesh>
       </Float>
 
-      {/* Modules - orbit radius expands with scroll */}
+      {/* Modules - with icons/text inside for clarity */}
       {[
-        { label: "CODE", basePos: [3.0, 0.6, 0.3], color: "#8B5CF6" as const, id: "software" },
-        { label: "CLOUD", basePos: [-3.0, 0.6, 0.3], color: "#06B6D4" as const, id: "cloud" },
-        { label: "AI", basePos: [0.3, 2.4, 1.2], color: "#EC4899" as const, id: "ai" },
-        { label: "DATA", basePos: [0.3, -2.4, 1.2], color: "#10B981" as const, id: "data" },
+        { label: "CODE", basePos: [3.0, 0.6, 0.3], color: "#8B5CF6" as const, id: "software", icon: "◧", sub: "{ }" },
+        { label: "CLOUD", basePos: [-3.0, 0.6, 0.3], color: "#06B6D4" as const, id: "cloud", icon: "☁", sub: "☁" },
+        { label: "AI", basePos: [0.3, 2.4, 1.2], color: "#EC4899" as const, id: "ai", icon: "✦", sub: "AI" },
+        { label: "DATA", basePos: [0.3, -2.4, 1.2], color: "#10B981" as const, id: "data", icon: "◫", sub: "DB" },
       ].map((mod) => {
         const isActive = activeModule === mod.id;
         const expand = 1 + scrollProgress * 0.5;
@@ -144,26 +144,51 @@ function Core({ activeModule, scrollProgress }: { activeModule: string | null; s
           <Float key={mod.label} speed={isActive ? 3.5 : 1.8 + scrollProgress} floatIntensity={isActive ? 1.4 : 0.6 + scrollProgress * 0.3} rotationIntensity={0.4 + scrollProgress * 0.2}>
             <group position={pos}>
               <mesh>
-                <boxGeometry args={[0.8 + scrollProgress * 0.1, 0.8 + scrollProgress * 0.1, 0.18]} />
+                <boxGeometry args={[0.9 + scrollProgress * 0.1, 0.9 + scrollProgress * 0.1, 0.22]} />
                 <meshStandardMaterial
                   color={isActive ? mod.color : "#15151F"}
                   emissive={mod.color}
-                  emissiveIntensity={isActive ? 2.5 + scrollProgress : 0.4 + scrollProgress * 0.5}
+                  emissiveIntensity={isActive ? 2.8 + scrollProgress : 0.6 + scrollProgress * 0.5}
                   transparent
-                  opacity={isActive ? 1 : 0.85}
+                  opacity={isActive ? 1 : 0.92}
                   roughness={0.2}
                   metalness={0.8}
                 />
               </mesh>
+              {/* Icon + Label inside cuboid - always visible */}
+              <Billboard>
+                <Text
+                  position={[0, 0.12, 0.14]}
+                  fontSize={0.32}
+                  color="white"
+                  anchorX="center"
+                  anchorY="middle"
+                  outlineWidth={0.04}
+                  outlineColor="black"
+                >
+                  {mod.icon}
+                </Text>
+                <Text
+                  position={[0, -0.22, 0.14]}
+                  fontSize={0.14}
+                  color="white"
+                  anchorX="center"
+                  anchorY="middle"
+                  outlineWidth={0.025}
+                  outlineColor="black"
+                >
+                  {mod.label}
+                </Text>
+              </Billboard>
               {isActive && (
                 <>
                   <mesh position={[0, 0, -0.15]}>
-                    <planeGeometry args={[1.6 + scrollProgress * 0.5, 1.6 + scrollProgress * 0.5]} />
-                    <meshBasicMaterial color={mod.color} transparent opacity={0.35} />
+                    <planeGeometry args={[1.8 + scrollProgress * 0.5, 1.8 + scrollProgress * 0.5]} />
+                    <meshBasicMaterial color={mod.color} transparent opacity={0.4} />
                   </mesh>
-                  <mesh position={[0, 0, -0.3]}>
-                    <planeGeometry args={[2.4 + scrollProgress, 2.4 + scrollProgress]} />
-                    <meshBasicMaterial color={mod.color} transparent opacity={0.15} />
+                  <mesh position={[0, 0, -0.35]}>
+                    <planeGeometry args={[2.8 + scrollProgress, 2.8 + scrollProgress]} />
+                    <meshBasicMaterial color={mod.color} transparent opacity={0.18} />
                   </mesh>
                 </>
               )}
